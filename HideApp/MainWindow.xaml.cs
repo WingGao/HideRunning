@@ -10,6 +10,8 @@ namespace HideApp
 {
     public partial class MainWindow : Window
     {
+        private System.Windows.Forms.NotifyIcon _notifyIcon;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -17,12 +19,20 @@ namespace HideApp
             LvApps.ItemsSource = CAppCollection.Collect;
             //LvApps.AddHandler(MouseDoubleClickEvent,new MouseButtonEventHandler (ItemDoubleClick));
             //LvApps.AddHandler(MouseRightButtonUpEvent, new MouseButtonEventHandler(ItemRightClick));
+
+            _notifyIcon = new System.Windows.Forms.NotifyIcon();
+            _notifyIcon.BalloonTipText = "The app has been minimised. Click the tray icon to show.";
+            _notifyIcon.BalloonTipTitle = Title;
+            _notifyIcon.Text = Title;
+            _notifyIcon.Icon = new System.Drawing.Icon("icon.ico");
+            _notifyIcon.Click += NotifyIcon_Click;
         }
+
         protected void ItemDoubleClick(object sender, MouseButtonEventArgs routedEventArgs)
         {
             if (sender is ListViewItem)
             {
-                var app = ((ListViewItem)sender).Content as CApp;
+                var app = ((ListViewItem) sender).Content as CApp;
                 if (app.IsRunning) CAppVisiableCommand(app, null);
                 else CAppRunCommand(app, null);
             }
@@ -32,7 +42,7 @@ namespace HideApp
         {
             if (sender is ListViewItem)
             {
-                ListViewItem lvItem = (ListViewItem)sender;
+                ListViewItem lvItem = (ListViewItem) sender;
                 var app = lvItem.Content as CApp;
                 Console.WriteLine("right" + app.Id);
                 ContextMenu cm = new ContextMenu();
@@ -74,7 +84,7 @@ namespace HideApp
             appWindow.ShowDialog();
         }
 
-        void CAppRunCommand(object sender, RoutedEventArgs e)
+        private void CAppRunCommand(object sender, RoutedEventArgs e)
         {
             var app = GetAppFromContextMenu(sender);
             if (!app.IsRunning)
@@ -96,6 +106,7 @@ namespace HideApp
             }
             Console.WriteLine("run " + app.Command);
         }
+
         private void CAppStopCommand(object sender, RoutedEventArgs args)
         {
             var app = GetAppFromContextMenu(sender);
@@ -106,6 +117,7 @@ namespace HideApp
             }
             Console.WriteLine("stop " + app.Command);
         }
+
         private void CAppVisiableCommand(object sender, RoutedEventArgs args)
         {
             var app = GetAppFromContextMenu(sender);
@@ -127,6 +139,7 @@ namespace HideApp
             CAppWindow appWindow = new CAppWindow(app);
             appWindow.ShowDialog();
         }
+
         private void CAppDeleteCommand(object sender, RoutedEventArgs args)
         {
             var app = GetAppFromContextMenu(sender);
@@ -139,7 +152,7 @@ namespace HideApp
             if (sender is MenuItem)
             {
                 MenuItem mnu = sender as MenuItem;
-                ListViewItem lvItem = ((ContextMenu)mnu.Parent).PlacementTarget as ListViewItem;
+                ListViewItem lvItem = ((ContextMenu) mnu.Parent).PlacementTarget as ListViewItem;
                 return lvItem.Content as CApp;
             }
             else if (sender is CApp)
@@ -151,7 +164,44 @@ namespace HideApp
 
         [DllImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
-        static extern bool ShowWindow(IntPtr hWnd, ShowWindowCommands nCmdShow);
+        private static extern bool ShowWindow(IntPtr hWnd, ShowWindowCommands nCmdShow);
 
+        #region close to tray
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+
+            if (_notifyIcon != null)
+            {
+                _notifyIcon.Visible = true;
+                e.Cancel = true;
+                Hide();
+            }
+            else
+            {
+                foreach (var app in CAppCollection.Collect)
+                {
+                    if (app.Process != null && !app.Process.HasExited)
+                    {
+                        app.Process.Kill();
+                    }
+                }
+            }
+        }
+
+        private void NotifyIcon_Click(object sender, EventArgs e)
+        {
+            Show();
+            _notifyIcon.Visible = false;
+
+        }
+
+        #endregion
+
+        private void ExitButton_Click(object sender, RoutedEventArgs e)
+        {
+            _notifyIcon = null;
+            Close();
+        }
     }
 }

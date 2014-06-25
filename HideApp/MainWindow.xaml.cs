@@ -91,7 +91,7 @@ namespace HideApp
             {
                 try
                 {
-                    app.Process = Process.Start(app.Command);
+                    app.Process = Process.Start(app.Path, app.Args);
                     while (app.Process.MainWindowHandle.ToInt64() == 0)
                     {
                         Thread.Sleep(100);
@@ -170,7 +170,6 @@ namespace HideApp
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-
             if (_notifyIcon != null)
             {
                 _notifyIcon.Visible = true;

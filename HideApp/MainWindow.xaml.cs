@@ -91,7 +91,13 @@ namespace HideApp
             {
                 try
                 {
-                    app.Process = Process.Start(app.Path, app.Args);
+                    ProcessStartInfo info = new ProcessStartInfo
+                    {
+                        FileName = app.Path,
+                        Arguments = app.Args,
+                        WorkingDirectory = app.WorkDirectory
+                    };
+                    app.Process = Process.Start(info);
                     while (app.Process.MainWindowHandle.ToInt64() == 0)
                     {
                         Thread.Sleep(100);

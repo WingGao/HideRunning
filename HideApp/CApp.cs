@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -109,6 +110,15 @@ namespace HideApp
         private bool _isVisible = false;
 
         public Process Process;
+
+        public String WorkDirectory
+        {
+            get
+            {
+                FileInfo file = new FileInfo(_path);
+                return file.DirectoryName;
+            }
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
 

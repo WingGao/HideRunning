@@ -21,6 +21,7 @@
                 <Style  x:Key="itemstyle" TargetType="{x:Type ListViewItem}">
                     <EventSetter Event="MouseDoubleClick" Handler="ItemDoubleClick" />
                     <EventSetter Event="MouseRightButtonUp" Handler="ItemRightClick" />
+                    <Setter Property="ToolTip" Value="{Binding Command}"/>
                 </Style >
             </ListView.Resources>
             <ListView.View>

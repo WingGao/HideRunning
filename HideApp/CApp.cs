@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -93,6 +94,8 @@ namespace HideApp
             set
             {
                 _isVisible = value;
+                CAppCollection.ShowWindow(Process.MainWindowHandle,
+                    value ? ShowWindowCommands.Show : ShowWindowCommands.Hide);
                 OnPropertyChanged("State");
             }
         }
@@ -178,5 +181,14 @@ namespace HideApp
             Settings.Default.CApps = settingCollection;
             Settings.Default.Save();
         }
+
+        public static CApp GetAppByProcess(Process s)
+        {
+            return Collect.Single(a => a.Process == s);
+        }
+
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool ShowWindow(IntPtr hWnd, ShowWindowCommands nCmdShow);
     }
 }

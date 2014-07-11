@@ -102,7 +102,9 @@ namespace HideApp
                     {
                         Thread.Sleep(100);
                     }
-                    ShowWindow(app.Process.MainWindowHandle, ShowWindowCommands.Hide);
+                    app.Process.EnableRaisingEvents = true;
+                    app.Process.Exited += Process_Exited;
+                    app.IsVisible = false;
                     app.IsRunning = true;
                 }
                 catch (Exception)
@@ -113,13 +115,24 @@ namespace HideApp
             Console.WriteLine("run " + app.Command);
         }
 
+        void Process_Exited(object sender, EventArgs e)
+        {
+            var app = CAppCollection.GetAppByProcess((Process) sender);
+            if (app != null)
+            {
+                Console.WriteLine("Exited "+app.Name);
+                app.IsRunning = false;
+            }
+            
+        }
+
+        
         private void CAppStopCommand(object sender, RoutedEventArgs args)
         {
             var app = GetAppFromContextMenu(sender);
             if (app.IsRunning)
             {
                 app.Process.Kill();
-                app.IsRunning = false;
             }
             Console.WriteLine("stop " + app.Command);
         }
@@ -127,16 +140,7 @@ namespace HideApp
         private void CAppVisiableCommand(object sender, RoutedEventArgs args)
         {
             var app = GetAppFromContextMenu(sender);
-            if (app.IsVisible)
-            {
-                ShowWindow(app.Process.MainWindowHandle, ShowWindowCommands.Hide);
-                app.IsVisible = false;
-            }
-            else
-            {
-                ShowWindow(app.Process.MainWindowHandle, ShowWindowCommands.Show);
-                app.IsVisible = true;
-            }
+            app.IsVisible = !app.IsVisible; 
         }
 
         private void CAppEditCommand(object sender, RoutedEventArgs args)
@@ -168,9 +172,6 @@ namespace HideApp
             return null;
         }
 
-        [DllImport("user32.dll")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool ShowWindow(IntPtr hWnd, ShowWindowCommands nCmdShow);
 
         #region close to tray
 

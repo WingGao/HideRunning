@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace HideApp
 {
-    enum ShowWindowCommands
+    public enum ShowWindowCommands
     {
         /// <summary>
         /// Hides the window and activates another window.

@@ -35,6 +35,8 @@
         <StackPanel Orientation="Horizontal">
             <Button Content="Add" Width="40" Click="AddButton_Click"></Button>
             <Button Content="Exit" Width="40" Click="ExitButton_Click"></Button>
+            <Button Content="Up" Width="40" Click="ExitButton_Click"></Button>
+            <Button Content="Down" Width="40" Click="ExitButton_Click"></Button>
         </StackPanel>
     </StackPanel>
 </Window>

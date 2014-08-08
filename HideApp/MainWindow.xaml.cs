@@ -61,6 +61,11 @@ namespace HideApp
                     mia.Header = app.IsVisible ? "Hide" : "Show";
                     mia.Click += CAppVisiableCommand;
                     cm.Items.Add(mia);
+                    //restart
+                    MenuItem miRestar = new MenuItem();
+                    miRestar.Header = "Restar";
+                    miRestar.Click += CAppRestarCommand;
+                    cm.Items.Add(miRestar);
                 }
                 cm.Items.Insert(0, mi);
                 //edit
@@ -126,7 +131,17 @@ namespace HideApp
             
         }
 
-        
+        private void CAppRestarCommand(object sender, RoutedEventArgs e)
+        {
+            CAppStopCommand(sender, e);
+            var app = GetAppFromContextMenu(sender);
+            while (app.IsRunning)
+            {
+                Thread.Sleep(100);
+            }
+            CAppRunCommand(sender, e);
+        }
+
         private void CAppStopCommand(object sender, RoutedEventArgs args)
         {
             var app = GetAppFromContextMenu(sender);

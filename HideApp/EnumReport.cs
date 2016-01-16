@@ -9,8 +9,16 @@ namespace HideApp
     public class EnumReport
     {
         [DllImport("user32.dll")]
+        public static extern IntPtr GetDesktopWindow();
+
+        [DllImport("user32.dll")]
         public static extern int EnumWindows(EnumWindowsCallBackPtr callPtr, int lPar);
-        
+        [DllImport("user32.dll")]
+        public static extern bool EnumChildWindows(IntPtr hwnd, EnumWindowsCallBackPtr func, IntPtr lParam);
+
+        [DllImport("user32.dll")]
+        public static extern IntPtr GetParent(IntPtr hwnd);
+
         [DllImport("user32.dll")]
         public static extern int GetWindowThreadProcessId(IntPtr hWnd, out int lpdwProcessId);
 

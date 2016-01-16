@@ -13,6 +13,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using HideApp.Annotations;
 using HideApp.Properties;
+using Newtonsoft.Json.Linq;
+using System.Collections;
 
 namespace HideApp
 {
@@ -107,23 +109,48 @@ namespace HideApp
                 _mainWindowHandle = this.Process.MainWindowHandle;
             else
             {
+                this.Process.Refresh();
                 List<IntPtr> hwnds = new List<IntPtr>();
-                EnumReport.EnumWindows(new EnumWindowsCallBackPtr((hwnd, lp) =>
+                IntPtr topWindow = EnumReport.GetDesktopWindow();
+                JArray mainObj = new JArray();
+                Hashtable hwndNodeMap = new Hashtable();
+                EnumReport.EnumChildWindows(topWindow, new EnumWindowsCallBackPtr((hwnd, lp) =>
                 {
+
                     int pid;
-                    EnumReport.GetWindowThreadProcessId(hwnd, out pid);
+                    int tid = EnumReport.GetWindowThreadProcessId(hwnd, out pid);
                     if (pid == this.Process.Id)
                     {
-                        int top = EnumReport.GetWindow(hwnd, EnumReport.GetWindow_Cmd.GW_OWNER);
-                        Console.WriteLine("process {0}, hwnd {1}, top {2}", pid, hwnd, top);
+                        //IntPtr hwndParent = EnumReport.GetParent(hwnd);
+                        //JObject mObj = new JObject();
+                        //mObj.Add("hwnd", JToken.FromObject(hwnd.ToInt32()));
+                        //mObj.Add("children", new JArray());
+                 
+                        //if (hwndParent == IntPtr.Zero)
+                        //{
+                        //    Console.WriteLine("root {0}", hwnd);
+                        //}else
+                        //{
+                        //    Console.WriteLine("hwnd {0}, parentHwnd {1}", hwnd, hwndParent);
+                        //}
+
+                        //int top = EnumReport.GetWindow(hwnd, EnumReport.GetWindow_Cmd.GW_OWNER);
+                        //Console.WriteLine("process {0}, hwnd {1}, tid {2}", pid, hwnd, tid);
                         hwnds.Add(hwnd);
                     }
                     //Console.WriteLine("process {0}, hwnd {1}", pid, hwnd);
                     return true;
-                }), 0);
-                if(hwnds.Count > 0)
+                }), IntPtr.Zero);
+                if (hwnds.Count > 0)
                 {
-                    _mainWindowHandle = hwnds.Where(x => EnumReport.IsWindowVisible(x)).ToArray()[0];
+                    var visA = hwnds.Where(x => EnumReport.IsWindowVisible(x));
+                    if (visA.Count() > 0 )
+                        _mainWindowHandle = visA.OrderBy(x=> x).ElementAt(0);
+                    //else
+                    //{
+                    //    hwnds.Sort(Comparer<IntPtr>.Create((x,y)=> x.ToInt32()-y.ToInt32()));
+                    //    _mainWindowHandle = hwnds[0];
+                    //}
                 }
             }
             return _mainWindowHandle != IntPtr.Zero;
@@ -230,7 +257,15 @@ namespace HideApp
 
         public static CApp GetAppByProcess(Process s)
         {
-            return Collect.Single(a => a.Process == s);
+            return Collect.SingleOrDefault(a => a.Process == s);
+        }
+
+        public static void CloseAll()
+        {
+            foreach (var app in Collect)
+            {
+                app.Exit();
+            }
         }
 
         [DllImport("user32.dll")]

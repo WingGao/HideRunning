@@ -220,6 +220,10 @@ namespace HideApp
         private void ExitButton_Click(object sender, RoutedEventArgs e)
         {
             _notifyIcon = null;
+            if(MessageBox.Show("Close all running processes?","",MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            {
+                CAppCollection.CloseAll();
+            }
             Close();
         }
     }

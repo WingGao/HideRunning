@@ -32,7 +32,7 @@ namespace HideApp
         {
             if (sender is ListViewItem)
             {
-                var app = ((ListViewItem) sender).Content as CApp;
+                var app = ((ListViewItem)sender).Content as CApp;
                 if (app.IsRunning) CAppVisiableCommand(app, null);
                 else CAppRunCommand(app, null);
             }
@@ -42,7 +42,7 @@ namespace HideApp
         {
             if (sender is ListViewItem)
             {
-                ListViewItem lvItem = (ListViewItem) sender;
+                ListViewItem lvItem = (ListViewItem)sender;
                 var app = lvItem.Content as CApp;
                 Console.WriteLine("right" + app.Id);
                 ContextMenu cm = new ContextMenu();
@@ -89,6 +89,8 @@ namespace HideApp
             appWindow.ShowDialog();
         }
 
+
+
         private void CAppRunCommand(object sender, RoutedEventArgs e)
         {
             var app = GetAppFromContextMenu(sender);
@@ -103,18 +105,18 @@ namespace HideApp
                         WorkingDirectory = app.WorkDirectory
                     };
                     app.Process = Process.Start(info);
-                    while (app.Process.MainWindowHandle.ToInt64() == 0)
+                    while (!app.RefreshMainWindowHandle())
                     {
-                        Thread.Sleep(100);
+                        Thread.Sleep(300);
                     }
                     app.Process.EnableRaisingEvents = true;
                     app.Process.Exited += Process_Exited;
                     app.IsVisible = false;
                     app.IsRunning = true;
                 }
-                catch (Exception)
+                catch (Exception exp)
                 {
-
+                    Console.WriteLine(exp);
                 }
             }
             Console.WriteLine("run " + app.Command);
@@ -122,13 +124,12 @@ namespace HideApp
 
         void Process_Exited(object sender, EventArgs e)
         {
-            var app = CAppCollection.GetAppByProcess((Process) sender);
+            var app = CAppCollection.GetAppByProcess((Process)sender);
             if (app != null)
             {
-                Console.WriteLine("Exited "+app.Name);
-                app.IsRunning = false;
+                app.Exit();
             }
-            
+
         }
 
         private void CAppRestarCommand(object sender, RoutedEventArgs e)
@@ -145,17 +146,14 @@ namespace HideApp
         private void CAppStopCommand(object sender, RoutedEventArgs args)
         {
             var app = GetAppFromContextMenu(sender);
-            if (app.IsRunning)
-            {
-                app.Process.Kill();
-            }
+            app.Exit();
             Console.WriteLine("stop " + app.Command);
         }
 
         private void CAppVisiableCommand(object sender, RoutedEventArgs args)
         {
             var app = GetAppFromContextMenu(sender);
-            app.IsVisible = !app.IsVisible; 
+            app.IsVisible = !app.IsVisible;
         }
 
         private void CAppEditCommand(object sender, RoutedEventArgs args)
@@ -177,7 +175,7 @@ namespace HideApp
             if (sender is MenuItem)
             {
                 MenuItem mnu = sender as MenuItem;
-                ListViewItem lvItem = ((ContextMenu) mnu.Parent).PlacementTarget as ListViewItem;
+                ListViewItem lvItem = ((ContextMenu)mnu.Parent).PlacementTarget as ListViewItem;
                 return lvItem.Content as CApp;
             }
             else if (sender is CApp)

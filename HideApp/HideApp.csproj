@@ -55,6 +55,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="EnumReport.cs" />
     <Compile Include="ShowWindowCommands.cs" />
     <Page Include="CAppWindow.xaml">
       <SubType>Designer</SubType>

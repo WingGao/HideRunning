@@ -94,10 +94,39 @@ namespace HideApp
             set
             {
                 _isVisible = value;
-                CAppCollection.ShowWindow(Process.MainWindowHandle,
+                CAppCollection.ShowWindow(_mainWindowHandle,
                     value ? ShowWindowCommands.Show : ShowWindowCommands.Hide);
                 OnPropertyChanged("State");
             }
+        }
+
+        private IntPtr _mainWindowHandle = IntPtr.Zero;
+        public bool RefreshMainWindowHandle()
+        {
+            if (this.Process.MainWindowHandle != IntPtr.Zero)
+                _mainWindowHandle = this.Process.MainWindowHandle;
+            else
+            {
+                List<IntPtr> hwnds = new List<IntPtr>();
+                EnumReport.EnumWindows(new EnumWindowsCallBackPtr((hwnd, lp) =>
+                {
+                    int pid;
+                    EnumReport.GetWindowThreadProcessId(hwnd, out pid);
+                    if (pid == this.Process.Id)
+                    {
+                        int top = EnumReport.GetWindow(hwnd, EnumReport.GetWindow_Cmd.GW_OWNER);
+                        Console.WriteLine("process {0}, hwnd {1}, top {2}", pid, hwnd, top);
+                        hwnds.Add(hwnd);
+                    }
+                    //Console.WriteLine("process {0}, hwnd {1}", pid, hwnd);
+                    return true;
+                }), 0);
+                if(hwnds.Count > 0)
+                {
+                    _mainWindowHandle = hwnds.Where(x => EnumReport.IsWindowVisible(x)).ToArray()[0];
+                }
+            }
+            return _mainWindowHandle != IntPtr.Zero;
         }
 
         public bool IsRunning
@@ -135,6 +164,23 @@ namespace HideApp
         public String ToSettingString()
         {
             return String.Format("{1}{0}{2}{0}{3}", TagChar, Name, Path, Args);
+        }
+
+        public void Exit()
+        {
+            if (this.Process == null)
+                return;
+            try
+            {
+                this.Process.Kill();
+            }
+            catch (InvalidOperationException)
+            {
+            }
+            this.IsRunning = false;
+            this.Process = null;
+            _mainWindowHandle = IntPtr.Zero;
+            Console.WriteLine("Exited " + this.Name);
         }
     }
 

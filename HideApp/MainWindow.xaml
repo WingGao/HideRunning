@@ -1,7 +1,7 @@
 ﻿<Window x:Class="HideApp.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="HideApp" Height="350" Width="525" Icon="icon.ico" Closing="Window_Closing">
+        Title="HideApp" Height="350" Width="525" Icon="icon.ico" Closing="Window_Closing" Loaded="Window_Loaded">
     <Window.Resources>
         <DataTemplate x:Key="itemContextMenu">
             <ListViewItem Tag="{Binding DataContext, RelativeSource={RelativeSource AncestorType={x:Type ListViewItem}}}">

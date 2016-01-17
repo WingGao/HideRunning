@@ -1,0 +1,5 @@
+﻿# type | programe name
+# type P : process
+# P | x.exe
+
+P | YunDetectService.exe

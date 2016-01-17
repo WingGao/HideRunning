@@ -8,3 +8,5 @@ HideApp/bin/
 HideApp/obj/
 .vs/
 HideApp/HideApp.csproj.user
+UnitTestP/obj/
+UnitTestP/bin/

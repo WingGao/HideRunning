@@ -28,6 +28,11 @@ namespace HideApp
             _notifyIcon.Click += NotifyIcon_Click;
         }
 
+        public void onStart()
+        {
+
+        }
+
         protected void ItemDoubleClick(object sender, MouseButtonEventArgs routedEventArgs)
         {
             if (sender is ListViewItem)
@@ -219,6 +224,11 @@ namespace HideApp
                 CAppCollection.CloseAll();
             }
             Close();
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            KillProcess.Run();
         }
     }
 }

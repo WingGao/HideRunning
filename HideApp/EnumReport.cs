@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace HideApp
@@ -42,6 +44,17 @@ namespace HideApp
         {
             Console.WriteLine("Window handle is " + hwnd);
             return true;
+        }
+
+        public static List<int> IntPtrToIntList(List<IntPtr> p)
+        {
+            return p.ConvertAll(x => x.ToInt32());
+        }
+        public static IntPtr GetTopPtr(IEnumerable<IntPtr> p)
+        {
+            var pl = p.Select(x => x.ToInt32()).ToList();
+            pl.Sort();
+            return new IntPtr(pl[0]);
         }
     }
 

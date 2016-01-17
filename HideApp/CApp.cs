@@ -96,8 +96,8 @@ namespace HideApp
             set
             {
                 _isVisible = value;
-                CAppCollection.ShowWindow(_mainWindowHandle,
-                    value ? ShowWindowCommands.Show : ShowWindowCommands.Hide);
+                if (_mainWindowHandle != IntPtr.Zero)
+                    CAppCollection.ShowWindow(_mainWindowHandle, value ? ShowWindowCommands.Show : ShowWindowCommands.Hide);
                 OnPropertyChanged("State");
             }
         }
@@ -105,6 +105,9 @@ namespace HideApp
         private IntPtr _mainWindowHandle = IntPtr.Zero;
         public bool RefreshMainWindowHandle()
         {
+            if (!this.IsRunning)
+                return true;
+
             if (this.Process.MainWindowHandle != IntPtr.Zero)
                 _mainWindowHandle = this.Process.MainWindowHandle;
             else
@@ -125,7 +128,7 @@ namespace HideApp
                         //JObject mObj = new JObject();
                         //mObj.Add("hwnd", JToken.FromObject(hwnd.ToInt32()));
                         //mObj.Add("children", new JArray());
-                 
+
                         //if (hwndParent == IntPtr.Zero)
                         //{
                         //    Console.WriteLine("root {0}", hwnd);
@@ -144,8 +147,8 @@ namespace HideApp
                 if (hwnds.Count > 0)
                 {
                     var visA = hwnds.Where(x => EnumReport.IsWindowVisible(x));
-                    if (visA.Count() > 0 )
-                        _mainWindowHandle = visA.OrderBy(x=> x).ElementAt(0);
+                    if (visA.Count() > 0)
+                        _mainWindowHandle = EnumReport.GetTopPtr(visA);
                     //else
                     //{
                     //    hwnds.Sort(Comparer<IntPtr>.Create((x,y)=> x.ToInt32()-y.ToInt32()));
@@ -158,7 +161,8 @@ namespace HideApp
 
         public bool IsRunning
         {
-            get {
+            get
+            {
                 if (this.Process != null && !this.Process.HasExited)
                     return true;
                 return false;

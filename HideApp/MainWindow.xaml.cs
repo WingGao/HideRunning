@@ -96,27 +96,22 @@ namespace HideApp
             var app = GetAppFromContextMenu(sender);
             if (!app.IsRunning)
             {
-                try
+
+                ProcessStartInfo info = new ProcessStartInfo
                 {
-                    ProcessStartInfo info = new ProcessStartInfo
-                    {
-                        FileName = app.Path,
-                        Arguments = app.Args,
-                        WorkingDirectory = app.WorkDirectory
-                    };
-                    app.Process = Process.Start(info);
-                    while (!app.RefreshMainWindowHandle())
-                    {
-                        Thread.Sleep(300);
-                    }
-                    app.Process.EnableRaisingEvents = true;
-                    app.Process.Exited += Process_Exited;
-                    app.IsVisible = false;
-                }
-                catch (Exception exp)
+                    FileName = app.Path,
+                    Arguments = app.Args,
+                    WorkingDirectory = app.WorkDirectory
+                };
+                app.Process = Process.Start(info);
+                app.Process.EnableRaisingEvents = true;
+                app.Process.Exited += Process_Exited;
+                while (!app.RefreshMainWindowHandle())
                 {
-                    Console.WriteLine(exp);
+                    Thread.Sleep(300);
                 }
+                app.IsVisible = false;
+
             }
             Console.WriteLine("run " + app.Command);
         }
@@ -219,7 +214,7 @@ namespace HideApp
         private void ExitButton_Click(object sender, RoutedEventArgs e)
         {
             _notifyIcon = null;
-            if(MessageBox.Show("Close all running processes?","",MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            if (MessageBox.Show("Close all running processes?", "", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
             {
                 CAppCollection.CloseAll();
             }

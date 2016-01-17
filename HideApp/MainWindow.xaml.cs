@@ -112,7 +112,6 @@ namespace HideApp
                     app.Process.EnableRaisingEvents = true;
                     app.Process.Exited += Process_Exited;
                     app.IsVisible = false;
-                    app.IsRunning = true;
                 }
                 catch (Exception exp)
                 {

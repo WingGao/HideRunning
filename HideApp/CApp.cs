@@ -85,7 +85,7 @@ namespace HideApp
 
         public String State
         {
-            get { return _isRunning ? ("Running/" + (_isVisible ? "Show" : "Hide")) : "Ready"; }
+            get { return this.IsRunning ? ("Running/" + (_isVisible ? "Show" : "Hide")) : "Ready"; }
         }
 
         private bool _isRunning = false;
@@ -158,11 +158,10 @@ namespace HideApp
 
         public bool IsRunning
         {
-            get { return _isRunning; }
-            set
-            {
-                _isRunning = value;
-                OnPropertyChanged("State");
+            get {
+                if (this.Process != null && !this.Process.HasExited)
+                    return true;
+                return false;
             }
         }
 
@@ -204,8 +203,8 @@ namespace HideApp
             catch (InvalidOperationException)
             {
             }
-            this.IsRunning = false;
             this.Process = null;
+            OnPropertyChanged("State");
             _mainWindowHandle = IntPtr.Zero;
             Console.WriteLine("Exited " + this.Name);
         }

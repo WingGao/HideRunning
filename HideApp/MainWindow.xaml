@@ -37,6 +37,7 @@
             <Button Content="Exit" Width="40" Click="ExitButton_Click"></Button>
             <Button Content="Up" Width="40" Click="ExitButton_Click"></Button>
             <Button Content="Down" Width="40" Click="ExitButton_Click"></Button>
+            <Button Content="EditKP" Width="40" Click="EditKP_Click"></Button>
         </StackPanel>
     </StackPanel>
 </Window>

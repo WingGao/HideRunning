@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
@@ -24,7 +25,7 @@ namespace HideApp
             _notifyIcon.BalloonTipText = "The app has been minimised. Click the tray icon to show.";
             _notifyIcon.BalloonTipTitle = Title;
             _notifyIcon.Text = Title;
-            _notifyIcon.Icon = new System.Drawing.Icon("icon.ico");
+            _notifyIcon.Icon = new System.Drawing.Icon(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "icon.ico"));
             _notifyIcon.Click += NotifyIcon_Click;
         }
 
@@ -223,12 +224,18 @@ namespace HideApp
             {
                 CAppCollection.CloseAll();
             }
+            KillProcess.Stop();
             Close();
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             KillProcess.Run();
+        }
+
+        private void EditKP_Click(object sender, RoutedEventArgs e)
+        {
+            Process.Start(KillProcess.ConfigFilePath);
         }
     }
 }

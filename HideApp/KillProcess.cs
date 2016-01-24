@@ -12,12 +12,15 @@ namespace HideApp
     public class KillProcess
     {
         private static bool _isRunning = false;
+        private static Thread _background;
+        public static string ConfigFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "killprocess.txt");
         public static void Run()
         {
             if (_isRunning)
                 return;
             _isRunning = true;
-            new Thread(Start).Start();
+            _background = new Thread(Start);
+            _background.Start();
         }
         static void Start()
         {
@@ -29,9 +32,16 @@ namespace HideApp
             }
         }
 
+        public static void Stop()
+        {
+            if (_isRunning)
+                _background.Abort();
+            _isRunning = false;
+            _background.Abort();
+        }
         public static void Load()
         {
-            String[] lines = File.ReadAllLines("killprocess.txt");
+            String[] lines = File.ReadAllLines(ConfigFilePath);
             for (int i = 0; i < lines.Length; i++)
             {
                 var line = lines[i].Trim();

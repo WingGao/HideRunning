@@ -69,5 +69,26 @@ namespace HideApp
                 }
             }
         }
+        public static void LoopWindows(List<string> classNames)
+        {
+            List<IntPtr> hwnds = new List<IntPtr>();
+            IntPtr topWindow = EnumReport.GetDesktopWindow();
+
+            EnumReport.EnumChildWindows(topWindow, new EnumWindowsCallBackPtr((hwnd, lp) =>
+            {
+
+                int pid;
+                int tid = EnumReport.GetWindowThreadProcessId(hwnd, out pid);
+                StringBuilder className = new StringBuilder(256);
+                EnumReport.GetClassName(hwnd, className, className.Capacity);
+                if (classNames.Contains(className.ToString().Trim()))
+                {
+                    bool res = EnumReport.CloseWindow(hwnd);
+
+                    Console.WriteLine("Close handler {2}, windows {0} {1}", className.ToString(), res ? "successed" : "failed", hwnd);
+                }
+                return true;
+            }), IntPtr.Zero);
+        }
     }
 }

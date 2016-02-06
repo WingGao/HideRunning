@@ -79,6 +79,11 @@ namespace HideApp
                 mib.Header = "Edit";
                 mib.Click += CAppEditCommand;
                 cm.Items.Add(mib);
+                //open Folder
+                MenuItem mid = new MenuItem();
+                mid.Header = "Open Folder";
+                mid.Click += CAppOpenFolderCommand;
+                cm.Items.Add(mid);
                 //delet
                 MenuItem mic = new MenuItem();
                 mic.Header = "Delete";
@@ -161,6 +166,12 @@ namespace HideApp
             var app = GetAppFromContextMenu(sender);
             CAppWindow appWindow = new CAppWindow(app);
             appWindow.ShowDialog();
+        }
+        private void CAppOpenFolderCommand(object sender, RoutedEventArgs args)
+        {
+            var app = GetAppFromContextMenu(sender);
+            CAppWindow appWindow = new CAppWindow(app);
+            Process.Start(Path.GetDirectoryName(app.Path));
         }
 
         private void CAppDeleteCommand(object sender, RoutedEventArgs args)

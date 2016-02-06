@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace HideApp
 {
@@ -27,6 +28,17 @@ namespace HideApp
         [DllImport("user32.dll", SetLastError = true)]
         public static extern int GetWindow(IntPtr hWnd, GetWindow_Cmd uCmd);
 
+        [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+        public static extern int GetClassName(IntPtr hWnd, StringBuilder lpClassName, int nMaxCount);
+
+        [DllImport("user32.dll")]
+        public static extern bool DestroyWindow(IntPtr hWnd);
+        [DllImport("user32.dll")]
+        public static extern bool CloseWindow(IntPtr hWnd);
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        public static extern IntPtr SendMessage(IntPtr hWnd, UInt32 Msg, IntPtr wParam, IntPtr lParam);
+
         public enum GetWindow_Cmd : uint
         {
             GW_HWNDFIRST = 0,
@@ -36,6 +48,10 @@ namespace HideApp
             GW_OWNER = 4,
             GW_CHILD = 5,
             GW_ENABLEDPOPUP = 6
+        }
+        public enum Msg: UInt32
+        {
+
         }
         [DllImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
